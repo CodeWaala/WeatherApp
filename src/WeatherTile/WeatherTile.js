@@ -5,55 +5,15 @@ import { weatherIcon } from "../constants";
 
 class WeatherTile extends React.Component {
   render() {
-    const { weatherData, cityName, errorData } = this.props;
+    const { weatherData, errorData } = this.props;
 
     if (errorData) {
-      return (
-        <Card>
-          <Button variant="secondary" disabled>
-            {errorData}
-          </Button>
-        </Card>
-      );
+      return this.renderError();
     } else if (!weatherData) {
       //   return <Card> {`Getting weather for: ${cityName}`} </Card>;
-      return (
-        <Card>
-          <Button variant="secondary" disabled>
-            <Spinner
-              as="span"
-              animation="grow"
-              size="sm"
-              role="status"
-              aria-hidden="true"
-            />
-            Loading...
-          </Button>
-        </Card>
-      );
+      return this.renderLoading();
     } else {
-      const {
-        weather_state_abbr,
-        applicable_date,
-        min_temp,
-        max_temp
-      } = weatherData;
-      return (
-        <>
-          <Card>
-            <Card.Img
-              variant="top"
-              src={`${weatherIcon}${weather_state_abbr}.png`}
-            />
-            <Card.Body>
-              <Card.Title>{cityName}</Card.Title>
-              <p>{applicable_date}</p>
-              <p>Min: {min_temp.toFixed(2)} &#8451;</p>
-              <p>Max: {max_temp.toFixed(2)} &#8451;</p>
-            </Card.Body>
-          </Card>
-        </>
-      );
+      return this.renderWeather();
     }
   }
 
@@ -62,6 +22,58 @@ class WeatherTile extends React.Component {
     if (!weatherData && getWeatherData) {
       getWeatherData(cityName);
     }
+  }
+
+  renderError() {
+    const { errorData } = this.props;
+    return (
+      <Card>
+        <Button variant="secondary" disabled>
+          {errorData}
+        </Button>
+      </Card>
+    );
+  }
+
+  renderLoading() {
+    return (
+      <Card>
+        <Button variant="secondary" disabled>
+          <Spinner
+            as="span"
+            animation="grow"
+            size="sm"
+            role="status"
+            aria-hidden="true"
+          />
+          Loading...
+        </Button>
+      </Card>
+    );
+  }
+
+  renderWeather() {
+    const { weatherData, cityName } = this.props;
+    const {
+      weather_state_abbr,
+      applicable_date,
+      min_temp,
+      max_temp
+    } = weatherData;
+    return (
+      <Card>
+        <Card.Img
+          variant="top"
+          src={`${weatherIcon}${weather_state_abbr}.png`}
+        />
+        <Card.Body>
+          <Card.Title>{cityName}</Card.Title>
+          <p>{applicable_date}</p>
+          <p>Min: {min_temp.toFixed(2)} &#8451;</p>
+          <p>Max: {max_temp.toFixed(2)} &#8451;</p>
+        </Card.Body>
+      </Card>
+    );
   }
 }
 

@@ -47,29 +47,26 @@ class App extends React.Component {
     );
   }
 
-  getWeatherData(cityName) {
+  async getWeatherData(cityName) {
     let { weatherData } = this.state;
     // make api calls, first to fetch the information of cities.
     const aCityDetailUrl = `${cityDetailsApiUrl}${cityName}`;
+    try {
+      const response = await fetch(aCityDetailUrl);
+      const cityDetails = await response.json();
 
-    fetch(aCityDetailUrl)
-      .then(response => response.json())
-      .then(cityDetails => {
-        const { woeid } = cityDetails[0];
-        const { day, month, year } = getTomorrowsDate();
-        const cityWeatherUrl = `${cityWeatherByIdUrl}${woeid}/${year}/${month}/${day}`;
-        fetch(cityWeatherUrl)
-          .then(response => response.json())
-          .then(cityWeatherData => {
-            weatherData[cityName] = cityWeatherData[0];
-            this.setState({ weatherData });
-          })
-          .catch(() => {
-            const { errorData } = this.state;
-            errorData[cityName] = "Could not load data!";
-            this.setState({ errorData });
-          });
-      });
+      const { woeid } = cityDetails[0];
+      const { day, month, year } = getTomorrowsDate();
+      const cityWeatherUrl = `${cityWeatherByIdUrl}${woeid}/${year}/${month}/${day}`;
+      const cityResponse = await fetch(cityWeatherUrl);
+      const cityWeatherData = await cityResponse.json();
+      weatherData[cityName] = cityWeatherData[0];
+      this.setState({ weatherData });
+    } catch (error) {
+      const { errorData } = this.state;
+      errorData[cityName] = "Could not load data!";
+      this.setState({ errorData });
+    }
   }
 }
 
